@@ -64,7 +64,7 @@ class StarboardConfig(PluginConfig):
             if channel_id in config.ignored_channels:
                 continue
 
-            if config.sources and channel_id in config.sources:
+            if config.sources and channel_id not in config.sources:
                 continue
 
             return (starboard, config)
@@ -435,6 +435,22 @@ class StarboardPlugin(Plugin):
         # Generate the embed and post it
         content, embed = self.get_embed(star, source_msg, config)
 
+        if not source_msg.guild.channels.get(starboard_id):
+            target = self.bot.state.channels.get(starboard_id)
+            if not (target and target.guild):
+                return
+            return self.log.exception((
+                u'post_star: attempted cross-guild post from '
+                u'{} ({}) to {} ({}) - #{} ({})'.format(
+                    source_msg.guild.name,
+                    source_msg.guild.id,
+                    target.guild.name,
+                    target.guild.id,
+                    target.name,
+                    target.id
+                )
+            ))
+        
         if not star.star_message_id:
             try:
                 msg = self.client.api.channels_messages_create(

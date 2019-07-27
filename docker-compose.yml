@@ -32,7 +32,7 @@ services:
     volumes:
       - ./frontend:/opt/frontend
     ports:
-      - "8080:8080"
+      - "1653:1653"
     depends_on:
       - web
   bot:
